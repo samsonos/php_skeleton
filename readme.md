@@ -1,16 +1,19 @@
-#SamsonPHP module for automatic optimizing of web-application images for [SamsonPHP](http://samsonphp.com) framework
+#SamsonPHP module for automatic module and code generation for [SamsonPHP](http://samsonphp.com) framework
 
 > Module automatically scans for supported image types in web-application and it's modules resources and perform
 > compression using external tools.
 > Also module stores special metadata about compressed images and their timestamps to avoid dublicate compression
 
-## Lossless .JPEG images compression
-Module uses [jpegOptim](http://freecode.com/projects/jpegoptim).
-To install jpegOptim under Ubuntu use: ```sudo apt-get install jpegoptim```
+## Automatic Local module generation
+For quick creating local module with name ```contacts``` you must visit url ```[domain]/skeleton/generate/contacts```
+System will automatically create
+ * ```app/view/contacts/index.php``` view file
+ * ```app/controller/contacts.php``` controller file
+ * ```css/contacts.less``` less file
+ * ```js/contacts.coffee``` coffee file
 
-
-## Lossless .PNG images compression
-Module uses [optiPNG](http://optipng.sourceforge.net/).
-To install optiPNG under Ubuntu use: ```sudo apt-get install optipng```
+## Automatic .less file generation from html
+For automatic creating .less file from html view ```contacts/index``` you must visit url ```[domain]/skeleton/less/contacts/index```
+System will automatically create ```css/contacts_index.less``` file with less selectors tree
 
 Developed by [SamsonOS](http://samsonos.com/)
