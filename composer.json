@@ -1,6 +1,6 @@
 {
-	"name":"samsonos/php_optimage",
-    "description":"SamsonPHP module for automatic optimizing of web-application images",
+	"name":"samsonos/php_skeleton",
+    "description":"SamsonPHP module for automatic module and code generation",
 	"author":{
         "name":"Vitaly Iegorov",
         "email":"egorov@samsonos.com"
