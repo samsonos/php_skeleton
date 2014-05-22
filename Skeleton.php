@@ -65,6 +65,8 @@ class Skeleton extends \samson\core\ExternalModule
      */
     protected function lessBuilder($node, & $less = '', $level = 0, $path = '')
     {
+        $prevPath = '';
+
         /**@var $child \DOMDocument */
         $child = null;
         foreach($node->childNodes as $child) {
@@ -99,9 +101,6 @@ class Skeleton extends \samson\core\ExternalModule
                     $selector = $child->nodeName;
                 }
 
-
-                elapsed($selector.'--'.$class.' '.$id.' '.$name);
-
                 // Analyze if node has valid children
                 $isComplex = false;
                 if ($child->hasChildNodes()) {
@@ -114,16 +113,19 @@ class Skeleton extends \samson\core\ExternalModule
                     }
                 }
 
-                if ($isComplex) {
+                // Build path selector
+                $_path = $path.'->'.$selector;
 
-                    // Build path selector
-                    $_path = $path.'->'.$selector;
+                // If this node has *normal nodes inside
+                if ($isComplex) {
 
                     // Don't go same path again
                     if (!in_array($_path, $this->lessSelectors)) {
 
                         // Save selector
                         $this->lessSelectors[] = $_path;
+
+                        elapsed('Building selector: '.$_path);
 
                         // Save less
                         if ($this->lessDebug) {
@@ -138,10 +140,12 @@ class Skeleton extends \samson\core\ExternalModule
                         // Close selector
                         $less .= "\n".$this->spacer($level).'}';
                     }
-                } else { // single element
+                } else if($prevPath != $_path){ // Single element and not like previous
                     $less .= "\n".$this->spacer($level).$selector.' {  }';
                 }
 
+                // Save last path
+                $prevPath = $_path;
             }
         }
     }
@@ -150,30 +154,50 @@ class Skeleton extends \samson\core\ExternalModule
      * Controller for building .less skeleton from html tree
      * @param string $path View path
      */
-    public function __less($path)
+    public function __less()
     {
         s()->async(true);
 
         $less = '';
 
+        $path = implode('/', url()->parameters);
+        $name = implode('_', url()->parameters);
+
         // Find path to view
         $_path = m('local')->findView($path);
 
+        $this->createDir('css');
+
+        // Generate pass to less file
+        $lessPath = 'css/'.$name.'.less';
+
+        // If we have found view file
         if (file_exists($_path)) {
 
-            // Read it
-            $html = file_get_contents($_path);
+            // If we have not generated this file before
+            if (!file_exists($lessPath)) {
 
-            // Remove all PHP code from view
-            $html = preg_replace('/<\?php.*?\?>/', '', $html);
+                // Read it
+                $html = file_get_contents($_path);
 
-            // Parse HTML
-            $doc = new \DOMDocument();
-            $doc->loadHTML($html);
+                // Remove all PHP code from view
+                $html = preg_replace('/<\?php.*?\?>/', '', $html);
 
-            $this->lessBuilder($doc, $less);
+                // Parse HTML
+                $doc = new \DOMDocument();
+                $doc->loadHTML($html);
 
-            file_put_contents('css/test.less2', $less);
+                // Recursively build less tree
+                $this->lessBuilder($doc, $less);
+
+                // Write generated file
+                file_put_contents($lessPath, $less);
+
+                elapsed('Creating LESS file: '.$lessPath);
+
+            } else {
+                e('LESS file alerady exists(##) - remove it', E_SAMSON_CORE_ERROR, $lessPath);
+            }
 
         } else {
             e('View file not found(##)', E_SAMSON_CORE_ERROR, $path);
