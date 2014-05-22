@@ -1,0 +1,10 @@
+{
+	"name":"samsonos/php_optimage",
+    "description":"SamsonPHP module for automatic optimizing of web-application images",
+	"author":{
+        "name":"Vitaly Iegorov",
+        "email":"egorov@samsonos.com"
+    },
+	"version":"1.0.0",
+	"require":{"samsonos/php_core":"*"}
+}
