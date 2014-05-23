@@ -1,8 +1,6 @@
 #SamsonPHP module for automatic module and code generation for [SamsonPHP](http://samsonphp.com) framework
 
-> Module automatically scans for supported image types in web-application and it's modules resources and perform
-> compression using external tools.
-> Also module stores special metadata about compressed images and their timestamps to avoid dublicate compression
+> This module helps with various routine tasks and focused on their automatic completion
 
 ## Automatic Local module generation
 For quick creating local module with name ```contacts``` you must visit url ```[domain]/skeleton/generate/contacts```
