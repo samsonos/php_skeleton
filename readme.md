@@ -10,6 +10,10 @@ System will automatically create
  * ```css/contacts.less``` less file
  * ```js/contacts.coffee``` coffee file
 
+###Module generator Configuration
+Available one configurable parameters for tuning:
+ * ```boolean $createCoffee``` If true .coffee file will be generated otherwise .js
+
 ##Automatic .less file generation from html
 For automatic creating .less file from html view ```contacts/index``` you must visit url ```[domain]/skeleton/less/contacts/index```
 System will automatically create ```css/contacts_index.less``` file with less selectors tree
@@ -20,11 +24,13 @@ Available two configurable parameters for tuning less generator:
  * ```boolean $lessDebug``` True to output selector paths as comments in less file
 
 
-Example configuration class for this module:
+##Example configuration class for this module:
 ```
 class SkeletonConfig extends \samson\core\Config
 {
     public $__module = 'skeleton';
+
+    public $createCoffee = true;
 
     public $lessIgnore = array('html','body',...);
 
