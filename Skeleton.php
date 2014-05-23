@@ -62,9 +62,12 @@ class Skeleton extends \samson\core\ExternalModule
     }
 
     /**
-     * Reccurently build less file
-     * @param \DOMNode $node
-     * @param string $less Less file contents
+     * Build less file using recursion
+     *
+     * @param \DOMNode $node    Pointer to current DOM node
+     * @param string   $less    Less file contents
+     * @param int      $level   Current code depth
+     * @param string   $path    Current selector
      */
     protected function lessBuilder($node, & $less = '', $level = 0, $path = '')
     {
@@ -155,7 +158,6 @@ class Skeleton extends \samson\core\ExternalModule
 
     /**
      * Controller for building .less skeleton from html tree
-     * @param string $path View path
      */
     public function __less()
     {
