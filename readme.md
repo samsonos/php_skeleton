@@ -21,6 +21,8 @@ Available two configurable parameters for tuning less generator:
  * ```array $lessIgnore``` Collection of tags to ignore
  * ```boolean $lessDebug``` True to output selector paths as comments in less file
 
+
+Example configuration class for this module:
 ```
 class SkeletonConfig extends \samson\core\Config
 {
