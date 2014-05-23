@@ -12,8 +12,25 @@ System will automatically create
  * ```css/contacts.less``` less file
  * ```js/contacts.coffee``` coffee file
 
-## Automatic .less file generation from html
+##Automatic .less file generation from html
 For automatic creating .less file from html view ```contacts/index``` you must visit url ```[domain]/skeleton/less/contacts/index```
 System will automatically create ```css/contacts_index.less``` file with less selectors tree
+
+###Less generator Configuration
+Available two configurable parameters for tuning less generator:
+ * ```array $lessIgnore``` Collection of tags to ignore
+ * ```boolean $lessDebug``` True to output selector paths as comments in less file
+
+```
+class SkeletonConfig extends \samson\core\Config
+{
+    public $__module = 'skeleton';
+
+    public $lessIgnore = array('html','body',...);
+
+    public $lessDebug = true;
+}
+```
+
 
 Developed by [SamsonOS](http://samsonos.com/)
