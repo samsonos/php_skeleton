@@ -97,12 +97,12 @@ class Skeleton extends \samson\core\ExternalModule
 
                 // Define less selector
                 $selector = '';
-                if (isset($id{0})) {
-                    $selector = '#'.$id;
-                } else if (isset($class{0})) {
+                if (isset($class{0})) {
                     $selector = '.'.$class;
                 } else if (isset($name{0})) {
                     $selector = $child->nodeName.'[name='.$name.']';
+                } else if (isset($id{0})) {
+                    $selector = '#'.$id;
                 } else {
                     $selector = $child->nodeName;
                 }
