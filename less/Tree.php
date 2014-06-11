@@ -9,12 +9,12 @@
  * Class for manipulating
  * @author Vitaly Egorov <egorov@samsonos.com>
  * @copyright 2013 SamsonOS
- * @version 
+ * @version
  */
-class Tree 
+class Tree
 {
     /** Source html tree */
-    protected $html = '';
+    public $html = '';
 
     /** @var Node[] Collection of LESS nodes */
     protected $nodes = array();
@@ -39,7 +39,7 @@ class Tree
      * Create less node tree from file
      * @param string $path Path to file for analyzing
      */
-    public function __construct($path)
+    public function __construct($path = null)
     {
         // If file exists
         if (file_exists($path)) {
@@ -47,28 +47,11 @@ class Tree
             // Read it
             $this->html = file_get_contents($path);
 
-            // Remove all PHP code from view
-            $this->html = preg_replace('/<\?php.*?\?>/', '', $this->html);
-
-            // Parse HTML
-            $this->dom = new \DOMDocument();
-            $this->dom->loadHTML($this->html);
-
-            // Create empty top LESS Node
-            $this->less = new Node($this->dom);
-
-            // Generate LESS Node tree
-            $this->handleNode($this->dom, $this->less);
-
-
-
-            trace($this->toLESS(), true);
-            trace($this->html, true);
-
-        } else {
+        } else if(isset($path)) {
             return e('Cannot read view file[##]', E_SAMSON_CORE_ERROR, $path);
         }
     }
+
 
     /**
      * Generate spaces for specific code level
@@ -106,13 +89,40 @@ class Tree
 
     /**
      * Generate LESS code from current LESS Node tree
+     *
+     * @param string $html HTML code to parse
+     *
      * @return string Generated LESS code from tree
      */
-    public function toLESS()
+    public function toLESS($html = null)
     {
+        // Set new HTML code if passed
+        if(isset($html)) {
+            $this->html = trim($html);
+        }
+
         $output = '';
 
-        $this->_toLESS($this->less, $output);
+        // If HTML is not empty
+        if (isset($this->html{0})) {
+            // Remove all PHP code from view
+            $this->html = preg_replace('/<\?php.*?\?>/', '', $this->html);
+
+            // Parse HTML
+            $this->dom = new \DOMDocument();
+            $this->dom->loadHTML($this->html);
+
+            // Create empty top LESS Node
+            $this->less = new Node($this->dom);
+
+            // Generate LESS Node tree
+            $this->handleNode($this->dom, $this->less);
+
+            // Generate recursively LESS code
+            $this->_toLESS($this->less, $output);
+        } else {
+            $output = 'Nothing to convert =(';
+        }
 
         return $output;
     }
