@@ -75,13 +75,34 @@ class Skeleton extends \samson\core\ExternalModule
 
         /**@var $child \DOMDocument */
         $child = null;
-        foreach($node->childNodes as $child) {
+
+        /** Collection of valid HTML nodes */
+        $nodes = array();
+
+        // Collect or normal HTML nodes and those who in not ignored at this level
+        foreach($node->childNodes as & $child) {
             // Work only with DOMElements
             if($child->nodeType == 1 && !in_array($child->nodeName, $this->lessIgnore)) {
+
+                // Group node by html tag name
+                if (!isset($nodes[$child->nodeName])) {
+                    $nodes[$child->nodeName] = array();
+                }
+
+                // Add node to a group
+                $nodes[$child->nodeName][] = $child;
+            }
+        }
+
+        // Iterate all "supported" nodes
+        /** @var \DOMNode[] $group */
+        foreach($nodes as $tag => $group) {
+            foreach($group as $child) {
                 //elapsed($child->nodeName);
                 $class = '';
                 $id = '';
                 $name = '';
+
                 /**@var $attribute \DOMNode */
                 foreach ($child->attributes as $attribute) {
                     if($attribute->name == 'class') {
@@ -125,6 +146,8 @@ class Skeleton extends \samson\core\ExternalModule
                 // If this node has *normal nodes inside
                 if ($isComplex) {
 
+                    // TODO: handle duplicating inner elements
+
                     // Don't go same path again
                     if (!in_array($_path, $this->lessSelectors)) {
 
@@ -154,6 +177,14 @@ class Skeleton extends \samson\core\ExternalModule
                 $prevPath = $_path;
             }
         }
+    }
+
+    public function __less2()
+    {
+        s()->async(true);
+
+        $tree = new \samsonos\php\skeleton\Tree('app/view/index.php');
+
     }
 
     /**
