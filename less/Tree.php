@@ -120,6 +120,7 @@ class Tree
 
             // Generate recursively LESS code
             $this->_toLESS($this->less, $output);
+
         } else {
             $output = 'Nothing to convert =(';
         }
@@ -137,18 +138,28 @@ class Tree
         // Get all current level valid DOM nodes
         /** @var \DOMNode[] $group */
         foreach($this->getValidChildren($node) as $tag => $group) {
-            if(sizeof($group) > 1 && $group[0]->nodeName != 'div'){ // ignore div tags as groups
+            // If this tag meets more then one time
+            if(sizeof($group) > 1){
                 // Create group LESS node instance
-                $groupNode = new Node($group[0], $parent, $group[0]->nodeName);
+                $groupNode = new Node($group[0], $parent);
 
                 // Added created node as child
-                $parent->children[$groupNode->selector] = $groupNode;
+                $parent->children[] = $groupNode;
 
                 // Iterate grouped DOM nodes
                 foreach($group as $child) {
 
                     // Create LESS node instance
-                    $lessNode = new Node($child, $parent);
+                    $lessNode = new Node($child, $groupNode);
+
+                    // Iterate node classes to find mismatch with group parent
+                    for($i = 0; $i < sizeof($lessNode->class); $i++) {
+                        trace('Comparing nodes: '.$lessNode->class[$i].'-'.$groupNode->class[$i]);
+                        if($lessNode->class[$i] != $groupNode->class[$i]) {
+                            $lessNode->selector = '.'.$lessNode->class[$i];
+                            break;
+                        }
+                    }
 
                     // Ignore equal selector as parent
                     if ($lessNode->selector != $groupNode->selector) {
@@ -157,13 +168,32 @@ class Tree
                         $lessNode->selector = '&'.$lessNode->selector;
 
                         // Added created node as child
-                        $groupNode->children[$lessNode->selector] = $lessNode;
+                        $groupNode->children[] = $lessNode;
 
                         // Go deeper in recursion with new LESS node as parent
                         $this->handleNode($child, $lessNode);
 
                     } else { // Go deeper in recursion with current group node as parent
                         $this->handleNode($child, $groupNode);
+                    }
+                }
+
+                // If this node has multiple classes
+                if(sizeof($groupNode->class) > 1) {
+                    // Iterate all other classes except first one as it node already created
+                    for($i = 1; $i < sizeof($groupNode->class); $i++) {
+
+                        // Create LESS node instance
+                        $lessNode = new Node($group[0], $groupNode);
+
+                        // Add special LESS parent marker
+                        $lessNode->selector = '&.'.$groupNode->class[$i];
+
+                        // Added created node as child
+                        $groupNode->children[] = $lessNode;
+
+                        // Go deeper in recursion with new LESS node as parent
+                        $this->handleNode($group[0], $lessNode);
                     }
                 }
 

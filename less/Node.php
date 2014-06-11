@@ -61,7 +61,7 @@ class Node
             foreach ($node->attributes as $attribute) {
                 $value = trim($attribute->nodeValue);
                 if($attribute->name == 'class' && strlen($value)) {
-                    $this->class[] = $value;
+                    $this->class = explode(' ', $value);
                 } else if($attribute->name == 'id' && strlen($value)) {
                     $this->id = $value;
                 } else if($attribute->name == 'name' && strlen($value)) {
@@ -74,7 +74,10 @@ class Node
         if(!isset($selector)) {
             // Choose default LESS selector for node
             $this->selector = $this->tag;
-            if (isset($this->class[0])) {
+
+            // If we have class attribute
+            if (sizeof($this->class)) {
+                // Use the first class by default
                 $this->selector = '.'.$this->class[0];
             }
         }
