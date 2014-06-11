@@ -1,22 +1,19 @@
 <!-- Created by Vitaly Iegorov <egorov@samsonos.com> on 11.06.14 at 16:36 -->
 <html>
-    <head>Skeleton SamsonPHP module</head>
+    <head><title>Skeleton SamsonPHP module</title></head>
     <body>
-        <header>Automatic HTML to LESS converter</header>
+        <h1>Automatic HTML to LESS converter</h1>
         <section>
-            <form class="converter" action="<?php module_url('less_convert')?>" method="post">
+            <form class="converter" action="<?php module_url('lesssandbox')?>" method="post">
                 <div class="input source">
-                    <h2>Source HTML code</h2>
-                    <textarea name="source"><?php vi('source')?></textarea>
+                    <textarea name="source" placeholder="Source HTML code"><?php vi('source')?></textarea>
                 </div>
                 <div class="input less">
-                    <h2>Output LESS code</h2>
-                    <textarea name="less"><?php iv('less')?></textarea>
+                    <textarea name="less" placeholder="Output LESS code"><?php iv('less')?></textarea>
                 </div>
                 <input class="submit" type="submit" value="CONVERT">
             </form>
         </section>
-        <footer></footer>
     </body>
 </html>
  

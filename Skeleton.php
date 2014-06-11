@@ -46,7 +46,8 @@ class Skeleton extends \samson\core\ExternalModule
         }
     }
 
-    public function __less_convert()
+    /** Less sandbox controller for testing     */
+    public function __lesssandbox()
     {
         s()->template('view/dashboard.vphp');
 

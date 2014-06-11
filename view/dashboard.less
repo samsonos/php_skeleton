@@ -1,18 +1,37 @@
-section {
-  .converter {
-    .source {
-      h2 {
-      }
-      textarea {
-      }
+html {
+  body {
+    h1 {
+      font-size:2em;
     }
-    .less {
-      h2 {
+    section {
+      .converter {
+        width:100%;
+
+        .input {
+          float:left;
+          width:50%;
+          height:80%;
+
+          textarea {
+            width:100%;
+            height:90%;
+          }
+          &.less {
+            textarea {
+            }
+          }
+          &.source {
+            textarea {
+            }
+          }
+        }
+        .submit {
+          width:50%;
+          margin:0 auto;
+          height:10%;
+          display: block;
+        }
       }
-      textarea {
-      }
-    }
-    .submit {
     }
   }
 }
