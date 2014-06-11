@@ -135,13 +135,17 @@ class Tree
      * @param \DOMNode $node Pointer to current analyzed DOM node
      * @param Node     $parent  Pointer to parent LESS Node
      */
-    protected function handleNode(\DOMNode & $node, Node & $parent = null, & $path = array(), $level = true)
+    protected function handleNode(\DOMNode & $node, Node & $parent = null, & $path = array())
     {
-
-
         // Get all current level valid DOM nodes
         /** @var \DOMNode[] $group */
         $children = $this->getValidChildren($node);
+        $childrenTagArray = array();
+        foreach ($children as $child) {
+            $tag = $child->nodeName;
+            if (!isset($childrenTagArray[$tag])) $childrenTagArray[$tag] = 1;
+            else $childrenTagArray[$tag]++;
+        }
 
         foreach ($children as $tag => $child) {
             $childNode = new Node($child, $parent);
@@ -157,13 +161,23 @@ class Tree
             } else {
                 foreach($childNode->class as $class) {
 
-                    $class = '&.'.$class;
+                    if ($childrenTagArray[$childNode->tag] > 1)
+                    {
+                        $class = '&.'.$class;
+                        if(!isset($path[$child->nodeName][$class])) {
+                            $path[$child->nodeName][$class] = array();
+                        }
 
-                    if(!isset($path[$child->nodeName][$class])) {
-                        $path[$child->nodeName][$class] = array();
+                        $this->handleNode($child, $parent, $path[$child->nodeName][$class]);
+                    } else {
+
+                        $class = '.'.$class;
+                        if(!isset($path[$class])) {
+                            $path[$class] = array();
+                        }
+
+                        $this->handleNode($child, $parent, $path[$class]);
                     }
-
-                    $this->handleNode($child, $parent, $path[$child->nodeName][$class], false);
                 }
             }
         }
