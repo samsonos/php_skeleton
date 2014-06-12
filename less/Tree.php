@@ -186,36 +186,64 @@ class Tree
                 $this->handleNode($child, $path[$child->nodeName]);
 
             } else { // This child DOM node has CSS classes
+
+                // Get first node class and remove it from array og classes
+                $firstClass = array_shift($childNode->class);
+
+                // Save current LESS path
+                $oldPath = &$path;
+
+                // If there is more than one DOM child node with this tag name at this level
+                if ($childrenTagArray[$childNode->tag] > 1)
+                {
+                    // Create correct LESS class name
+                    $class = '&.'.$firstClass;
+
+                    // Create new multidimensional array key group with tag name group
+                    if(!isset($path[$child->nodeName][$class])) {
+                        $path[$child->nodeName][$class] = array();
+                    }
+
+                    // Go deeper in recursion with current child node and new path with tag name group and CSS class name group
+                    $this->handleNode($child, $path[$child->nodeName][$class]);
+
+                    // Make new path as current
+                    $path = & $path[$child->nodeName][$class];
+
+                } else { // There is only on child with this tag name at this level
+
+                    // Create correct LESS class name
+                    $class = '.'.$firstClass;
+
+                    // Create new multidimensional array key group without tag name group
+                    if(!isset($path[$class])) {
+                        $path[$class] = array();
+                    }
+
+                    // Go deeper in recursion with current child node and new path with CSS class name group
+                    $this->handleNode($child, $path[$class]);
+
+                    // Make new path as current
+                    $path = & $path[$class];
+                }
+
+                // Iterate all other classes starting from second class
                 foreach($childNode->class as $class) {
 
-                    // If there is more than one DOM child node with this tag name at this level
-                    if ($childrenTagArray[$childNode->tag] > 1)
-                    {
-                        // Create correct LESS class name
-                        $class = '&.'.$class;
+                    // Create correct LESS class name
+                    $class = '&.'.$class;
 
-                        // Create new multidimensional array key group with tag name group
-                        if(!isset($path[$child->nodeName][$class])) {
-                            $path[$child->nodeName][$class] = array();
-                        }
-
-                        // Go deeper in recursion with current child node and new path with tag name group and CSS class name group
-                        $this->handleNode($child, $path[$child->nodeName][$class]);
-
-                    } else { // There is only on child with this tag name at this level
-
-                        // Create correct LESS class name
-                        $class = '.'.$class;
-
-                        // Create new multidimensional array key group without tag name group
-                        if(!isset($path[$class])) {
-                            $path[$class] = array();
-                        }
-
-                        // Go deeper in recursion with current child node and new path with CSS class name group
-                        $this->handleNode($child, $path[$class]);
+                    // Create new multidimensional array key group with tag name group
+                    if(!isset($path[$class])) {
+                        $path[$class] = array();
                     }
+
+                    // Go deeper in recursion with current child node and new path with tag name group and CSS class name group
+                    $this->handleNode($child, $path[$class]);
                 }
+
+                // Return old LESS path
+                $path = & $oldPath;
             }
         }
     }
