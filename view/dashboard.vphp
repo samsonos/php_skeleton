@@ -30,5 +30,6 @@
             </form>
         </section>
         <div class="overlay"><?php echo m()->output('view/loader')?></div>
+        <div class="copyright">Developed by <a target="_blank" href="http://samsonos.com">SamsonOS</a></div>
     </body>
 </html>
