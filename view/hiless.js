@@ -22,7 +22,7 @@ var syntax = {
     'variable' : /(@@?-?[-a-z_0-9]+\s*)/g,
     'attribute': /(\*?-?[-a-z_0-9]+\s*)(?=:[^\{\};]*[\};])/mg,
     'selector' : /(\[[a-z]+)/g,
-    'tag'      : /(div|ul|li|a|p|aside|section|i|img|strong)/g,
+    'tag'      : /(div|ul|li|a|p|aside|section|i|img|strong|label|input|hr)/g,
     'id'       : /(#[\w-]+)(?=[^\{\}]*\{)/mg,
     'mixin'    : /([#\.][\w-]+)(?=[^;\{\}]*[;\}])/g,
     'element'  : /\b([a-z]+[0-9]?)\b(?=[^\{\}\);]*\{)/mg,

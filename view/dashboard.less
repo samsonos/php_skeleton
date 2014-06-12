@@ -12,24 +12,37 @@ html {
           width:50%;
           height:80%;
 
-          textarea{
+          .CodeMirror{
             width:100%;
             height:90%;
+            border-left:4px solid #eee;
+            border-top:1px solid #eee;
+            border-right:1px solid #eee;
+            border-bottom:1px solid #eee;
+            display: block;
+            color: #333;
+            background: #f8f8ff;
           }
 
-          pre {
-            width:100%;
-            height:90%;
-            overflow:auto;
+          &.less{
+            pre {
+              width:100%;
+              height:90%;
+              overflow:auto;
+              border-left:4px solid #eee;
+              border-top:1px solid #eee;
+              border-right:1px solid #eee;
+              border-bottom:1px solid #eee;
+              padding:5px 10px;
+              display: block;
+              color: #333;
+              background: #f8f8ff;
 
-            code {
-              padding:10px 20px;
+              code {
+              }
             }
           }
-          &.less {
-            textarea {
-            }
-          }
+
           &.source {
             textarea {
             }
