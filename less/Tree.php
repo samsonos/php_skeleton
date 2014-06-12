@@ -39,7 +39,7 @@ class Tree
      * Create less node tree from file
      * @param string $path Path to file for analyzing
      */
-    public function __construct($path)
+    public function __construct($path = '')
     {
         // If file exists
         if (file_exists($path)) {
@@ -50,23 +50,6 @@ class Tree
             // Remove all PHP code from view
             $this->html = preg_replace('/<\?php.*?\?>/', '', $this->html);
 
-            // Parse HTML
-            $this->dom = new \DOMDocument();
-            $this->dom->loadHTML($this->html);
-
-            // Create empty top LESS Node
-            $this->less = new Node($this->dom);
-
-            // Generate LESS Node tree
-            $this->handleNode($this->dom, $this->less);
-
-
-
-            trace($this->toLESS(), true);
-            trace($this->html, true);
-
-        } else {
-            return e('Cannot read view file[##]', E_SAMSON_CORE_ERROR, $path);
         }
     }
 
@@ -108,8 +91,23 @@ class Tree
      * Generate LESS code from current LESS Node tree
      * @return string Generated LESS code from tree
      */
-    public function toLESS()
+    public function toLESS($html = '')
     {
+        // Set new HTML if passed
+        if(isset($html)) {
+            $this->html = $html;
+        }
+
+        // Parse HTML
+        $this->dom = new \DOMDocument();
+        $this->dom->loadHTML($this->html);
+
+        // Create empty top LESS Node
+        $this->less = new Node($this->dom);
+
+        // Generate LESS Node tree
+        $this->handleNode($this->dom, $this->less);
+
         $output = '';
 
         $this->_toLESS($this->less, $output);

@@ -74,8 +74,16 @@ class Node
         if(!isset($selector)) {
             // Choose default LESS selector for node
             $this->selector = $this->tag;
-            if (isset($this->class[0])) {
-                $this->selector = '.'.$this->class[0];
+
+            $className = '';
+            // Iterate classes of this LESS node
+            for($i = 0; $i < sizeof($this->class); $i++) {
+                // Compare with parent class to find first unmatched
+                if($this->class[$i] != $parent->class[$i]) {
+                    // Store it as a class name
+                    $className = '.'.$this->class[$i];
+                    break;
+                }
             }
         }
     }
