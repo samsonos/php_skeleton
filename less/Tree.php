@@ -25,6 +25,10 @@ class Tree
     public static $ignoredNodes = array(
         'head',
         'html',
+        '.clear',
+        '&.clear',
+        '.clearfix',
+        '&.clearfix',
         'body',
         'meta',
         'script',
