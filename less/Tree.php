@@ -78,16 +78,19 @@ class Tree
         // Iterate all LESS path node array
         foreach ($node as $key => $child) {
 
+            // Flag for rendering current LESS path node
+            $render = !in_array($key, self::$ignoredNodes);
+
             // If this path key is not ignored
-            if(!in_array($key, self::$ignoredNodes)) {
+            if($render) {
                 $output .= "\n".$this->spacer($level).$key.' {';
             }
 
             // Go deeper in recursion
-            $this->_toLESS($child, $output, $level+1);
+            $this->_toLESS($child, $output, $render ? $level+1 : $level);
 
             // If this path key is not ignored
-            if(!in_array($key, self::$ignoredNodes)) {
+            if($render) {
                 $output .= "\n".$this->spacer($level).'}';
             }
         }
