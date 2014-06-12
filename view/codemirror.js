@@ -1,7 +1,7 @@
 /**
  * Created by Vitaly Egorov <egorov@samsonos.com> on 12.06.14.
  */
-s(document).pageInit(function(){
+s('#skeleton').pageInit(function(){
 
     // Bind HTML editor
     var ta = document.getElementsByName('source');
