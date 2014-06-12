@@ -14,7 +14,8 @@ s(document).pageInit(function(){
     var ta2 = document.getElementsByName('output');
     var lm = CodeMirror.fromTextArea(ta2[0], {
         lineNumbers: true,
-        mode: "css"
+        matchBrackets : true,
+        mode: "text/x-less"
     });
 
     // Bind LESS Code selection for copy
