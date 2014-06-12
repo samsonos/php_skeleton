@@ -30,6 +30,8 @@ class Tree
     /** @var array Collection of ignored DOM nodes */
     public static $ignoredNodes = array(
         'head',
+        'html',
+        'body',
         'meta',
         'script',
         'link',
@@ -80,12 +82,15 @@ class Tree
     protected function _toLESS(array $node, & $output = '', $level = 0)
     {
         foreach ($node as $key => $child) {
-
-            $output .= "\n".$this->spacer($level).$key.' {';
+            if(!in_array($key, self::$ignoredNodes)) {
+                $output .= "\n".$this->spacer($level).$key.' {';
+            }
 
             $this->_toLESS($child, $output, $level+1);
 
-            $output .= "\n".$this->spacer($level).'}';
+            if(!in_array($key, self::$ignoredNodes)) {
+                $output .= "\n".$this->spacer($level).'}';
+            }
         }
     }
 
@@ -132,87 +137,83 @@ class Tree
 
     /**
      * Handle current DOM node and transform it to LESS node
+     *
      * @param \DOMNode $node Pointer to current analyzed DOM node
-     * @param Node     $parent  Pointer to parent LESS Node
+     * @param array    $path
+     *
+     * @internal param \samsonos\php\skeleton\Node $parent Pointer to parent LESS Node
      */
-    protected function handleNode(\DOMNode & $node, Node & $parent = null, & $path = array())
+    protected function handleNode(\DOMNode & $node, & $path = array())
     {
-        // Get all current level valid DOM nodes
-        /** @var \DOMNode[] $group */
-        $children = $this->getValidChildren($node);
+        // Collect normal HTML DOM nodes
+        /** @var \DOMNode[] $children */
+        $children = array();
+        foreach($node->childNodes as $child) {
+            // Work only with DOMElements
+            if($child->nodeType == 1 ) {
+                $children[] = $child;
+            }
+        }
+
+        // Group current level HTML DOM nodes by tag name and count them
         $childrenTagArray = array();
         foreach ($children as $child) {
             $tag = $child->nodeName;
-            if (!isset($childrenTagArray[$tag])) $childrenTagArray[$tag] = 1;
+            if (!isset($childrenTagArray[$tag])) {
+                $childrenTagArray[$tag] = 1;
+            }
             else $childrenTagArray[$tag]++;
         }
 
-        foreach ($children as $tag => $child) {
-            $childNode = new Node($child, $parent);
+        // Iterate all normal DOM nodes
+        foreach ($children as $child) {
 
+            // Create LESS node
+            $childNode = new Node($child);
+
+            // If this LESS node has NO CSS classes
             if(sizeof($childNode->class) == 0 ) {
-
+                // Create new multidimensional array key group
                 if(!isset($path[$child->nodeName])) {
                     $path[$child->nodeName] = array();
                 }
 
-                $this->handleNode($child, $parent, $path[$child->nodeName]);
+                // Go deeper in recursion with current child node and new path
+                $this->handleNode($child, $path[$child->nodeName]);
 
-            } else {
+            } else { // This child DOM node has CSS classes
                 foreach($childNode->class as $class) {
 
+                    // If there is more than one DOM child node with this tag name at this level
                     if ($childrenTagArray[$childNode->tag] > 1)
                     {
+                        // Create correct LESS class name
                         $class = '&.'.$class;
+
+                        // Create new multidimensional array key group with tag name group
                         if(!isset($path[$child->nodeName][$class])) {
                             $path[$child->nodeName][$class] = array();
                         }
 
-                        $this->handleNode($child, $parent, $path[$child->nodeName][$class]);
-                    } else {
+                        // Go deeper in recursion with current child node and new path with tag name group and CSS class name group
+                        $this->handleNode($child, $path[$child->nodeName][$class]);
 
+                    } else { // There is only on child with this tag name at this level
+
+                        // Create correct LESS class name
                         $class = '.'.$class;
+
+                        // Create new multidimensional array key group without tag name group
                         if(!isset($path[$class])) {
                             $path[$class] = array();
                         }
 
-                        $this->handleNode($child, $parent, $path[$class]);
+                        // Go deeper in recursion with current child node and new path with CSS class name group
+                        $this->handleNode($child, $path[$class]);
                     }
                 }
             }
         }
-    }
-
-    /**
-     * Gather only valid DOM node children nodes, ignore text nodes and
-     * special ignored nodes
-     *
-     * @see Tree::$ignoredNodes
-     *
-     * @param \DOMNode $node    Pointer to DOM node for analyzing
-     *
-     * @return \DOMNode[] Collection of valid children DOM nodes grouped by node name as keys
-     */
-    protected function & getValidChildren(\DOMNode & $node)
-    {
-        $nodes = array();
-
-        // Collect normal HTML nodes and those who in not ignored at this level
-        foreach($node->childNodes as $child) {
-            // Work only with DOMElements
-            if($child->nodeType == 1 && !in_array($child->nodeName, self::$ignoredNodes)) {
-
-               /* // Group node by html tag name
-                if (!isset($nodes[$child->nodeName])) {
-                    $nodes[$child->nodeName] = array();
-                }*/
-
-                // Add node to a group
-                $nodes/*[$child->nodeName]*/[] = $child;
-            }
-        }
-
-        return $nodes;
     }
 }
  
