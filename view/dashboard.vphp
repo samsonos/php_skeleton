@@ -1,6 +1,8 @@
 <!-- Created by Vitaly Iegorov <egorov@samsonos.com> on 11.06.14 at 16:36 -->
 <html>
-    <head><title>Skeleton SamsonPHP module</title></head>
+    <head>
+        <title>Skeleton SamsonPHP module</title>
+    </head>
     <body>
         <h1>Automatic HTML to LESS converter</h1>
         <section>
@@ -9,7 +11,7 @@
                     <textarea name="source" placeholder="Source HTML code"><?php vi('source')?></textarea>
                 </div>
                 <div class="input less">
-                    <textarea name="less" placeholder="Output LESS code"><?php iv('less')?></textarea>
+                    <pre class="less"><code><?php vi('less')?></code></pre>
                 </div>
                 <input class="submit" type="submit" value="CONVERT">
             </form>
