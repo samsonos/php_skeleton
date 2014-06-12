@@ -9,12 +9,12 @@
  * Class for manipulating
  * @author Vitaly Egorov <egorov@samsonos.com>
  * @copyright 2013 SamsonOS
- * @version 
+ * @version
  */
-class Tree 
+class Tree
 {
     /** Source html tree */
-    protected $html = '';
+    public $html = '';
 
     /** @var Node[] Collection of LESS nodes */
     protected $nodes = array();
@@ -24,6 +24,8 @@ class Tree
 
     /** @var Node Pointer to current less element */
     protected $less;
+
+    protected $path;
 
     /** @var array Collection of ignored DOM nodes */
     public static $ignoredNodes = array(
@@ -39,7 +41,7 @@ class Tree
      * Create less node tree from file
      * @param string $path Path to file for analyzing
      */
-    public function __construct($path = '')
+    public function __construct($path = null)
     {
         // If file exists
         if (file_exists($path)) {
@@ -47,11 +49,11 @@ class Tree
             // Read it
             $this->html = file_get_contents($path);
 
-            // Remove all PHP code from view
-            $this->html = preg_replace('/<\?php.*?\?>/', '', $this->html);
-
+        } else if(isset($path)) {
+            return e('Cannot read view file[##]', E_SAMSON_CORE_ERROR, $path);
         }
     }
+
 
     /**
      * Generate spaces for specific code level
@@ -75,11 +77,11 @@ class Tree
      * @param string $output
      * @param int    $level
      */
-    protected function _toLESS(Node $node, & $output = '', $level = 0)
+    protected function _toLESS(array $node, & $output = '', $level = 0)
     {
-        foreach ($node->children as $child) {
+        foreach ($node as $key => $child) {
 
-            $output .= "\n".$this->spacer($level).$child->selector.' {';
+            $output .= "\n".$this->spacer($level).$key.' {';
 
             $this->_toLESS($child, $output, $level+1);
 
@@ -89,28 +91,41 @@ class Tree
 
     /**
      * Generate LESS code from current LESS Node tree
+     *
+     * @param string $html HTML code to parse
+     *
      * @return string Generated LESS code from tree
      */
-    public function toLESS($html = '')
+    public function toLESS($html = null)
     {
-        // Set new HTML if passed
+        // Set new HTML code if passed
         if(isset($html)) {
-            $this->html = $html;
+            $this->html = trim($html);
         }
-
-        // Parse HTML
-        $this->dom = new \DOMDocument();
-        $this->dom->loadHTML($this->html);
-
-        // Create empty top LESS Node
-        $this->less = new Node($this->dom);
-
-        // Generate LESS Node tree
-        $this->handleNode($this->dom, $this->less);
 
         $output = '';
 
-        $this->_toLESS($this->less, $output);
+        // If HTML is not empty
+        if (isset($this->html{0})) {
+            // Remove all PHP code from view
+            $this->html = preg_replace('/<\?php.*?\?>/', '', $this->html);
+
+            // Parse HTML
+            $this->dom = new \DOMDocument();
+            $this->dom->loadHTML($this->html);
+
+            // Create empty top LESS Node
+            $this->less = new Node($this->dom);
+
+            // Generate LESS Node tree
+            $this->handleNode($this->dom, $this->less, $this->path);
+
+            // Generate recursively LESS code
+            $this->_toLESS($this->path, $output);
+
+        } else {
+            $output = 'Nothing to convert =(';
+        }
 
         return $output;
     }
@@ -120,53 +135,49 @@ class Tree
      * @param \DOMNode $node Pointer to current analyzed DOM node
      * @param Node     $parent  Pointer to parent LESS Node
      */
-    protected function handleNode(\DOMNode & $node, Node & $parent = null)
+    protected function handleNode(\DOMNode & $node, Node & $parent = null, & $path = array())
     {
         // Get all current level valid DOM nodes
         /** @var \DOMNode[] $group */
-        foreach($this->getValidChildren($node) as $tag => $group) {
-            if(sizeof($group) > 1 && $group[0]->nodeName != 'div'){ // ignore div tags as groups
-                // Create group LESS node instance
-                $groupNode = new Node($group[0], $parent, $group[0]->nodeName);
+        $children = $this->getValidChildren($node);
+        $childrenTagArray = array();
+        foreach ($children as $child) {
+            $tag = $child->nodeName;
+            if (!isset($childrenTagArray[$tag])) $childrenTagArray[$tag] = 1;
+            else $childrenTagArray[$tag]++;
+        }
 
-                // Added created node as child
-                $parent->children[$groupNode->selector] = $groupNode;
+        foreach ($children as $tag => $child) {
+            $childNode = new Node($child, $parent);
 
-                // Iterate grouped DOM nodes
-                foreach($group as $child) {
+            if(sizeof($childNode->class) == 0 ) {
 
-                    // Create LESS node instance
-                    $lessNode = new Node($child, $parent);
-
-                    // Ignore equal selector as parent
-                    if ($lessNode->selector != $groupNode->selector) {
-
-                        // Add special LESS parent marker
-                        $lessNode->selector = '&'.$lessNode->selector;
-
-                        // Added created node as child
-                        $groupNode->children[$lessNode->selector] = $lessNode;
-
-                        // Go deeper in recursion with new LESS node as parent
-                        $this->handleNode($child, $lessNode);
-
-                    } else { // Go deeper in recursion with current group node as parent
-                        $this->handleNode($child, $groupNode);
-                    }
+                if(!isset($path[$child->nodeName])) {
+                    $path[$child->nodeName] = array();
                 }
 
+                $this->handleNode($child, $parent, $path[$child->nodeName]);
+
             } else {
-                // Iterate grouped DOM nodes
-                foreach($group as $child) {
+                foreach($childNode->class as $class) {
 
-                    // Create LESS node instance
-                    $lessNode = new Node($child, $parent);
+                    if ($childrenTagArray[$childNode->tag] > 1)
+                    {
+                        $class = '&.'.$class;
+                        if(!isset($path[$child->nodeName][$class])) {
+                            $path[$child->nodeName][$class] = array();
+                        }
 
-                    // Added created node as child
-                    $parent->children[$lessNode->selector] = $lessNode;
+                        $this->handleNode($child, $parent, $path[$child->nodeName][$class]);
+                    } else {
 
-                    // Go deeper in recursion
-                    $this->handleNode($child, $lessNode);
+                        $class = '.'.$class;
+                        if(!isset($path[$class])) {
+                            $path[$class] = array();
+                        }
+
+                        $this->handleNode($child, $parent, $path[$class]);
+                    }
                 }
             }
         }
@@ -191,13 +202,13 @@ class Tree
             // Work only with DOMElements
             if($child->nodeType == 1 && !in_array($child->nodeName, self::$ignoredNodes)) {
 
-                // Group node by html tag name
+               /* // Group node by html tag name
                 if (!isset($nodes[$child->nodeName])) {
                     $nodes[$child->nodeName] = array();
-                }
+                }*/
 
                 // Add node to a group
-                $nodes[$child->nodeName][] = $child;
+                $nodes/*[$child->nodeName]*/[] = $child;
             }
         }
 

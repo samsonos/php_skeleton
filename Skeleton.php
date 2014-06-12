@@ -46,145 +46,23 @@ class Skeleton extends \samson\core\ExternalModule
         }
     }
 
-    /**
-     * Generate spaces for specific code level
-     * @param integer $level Current code nesting level
-     *
-     * @return string Spaces string
-     */
-    protected function spacer($level)
+    /** Less sandbox controller for testing     */
+    public function __lesssandbox()
     {
-        $result = '';
-        for($i = 0; $i < $level; $i++) {
-            $result .= '  ';
+        s()->template('view/dashboard.vphp');
+
+        if(isset($_POST['source'])) {
+            // Build LESS node tree
+            $lessTree = new \samsonos\php\skeleton\Tree();
+
+            // Prepare view
+            $this->view('view/dashboard')
+                ->source($_POST['source'])
+                ->less($lessTree->toLESS($_POST['source']));
+
+        } else {
+            $this->view('view/dashboard');
         }
-        return $result;
-    }
-
-    /**
-     * Build less file using recursion
-     *
-     * @param \DOMNode $node    Pointer to current DOM node
-     * @param string   $less    Less file contents
-     * @param int      $level   Current code depth
-     * @param string   $path    Current selector
-     */
-    protected function lessBuilder($node, & $less = '', $level = 0, $path = '')
-    {
-        $prevPath = '';
-
-        /**@var $child \DOMDocument */
-        $child = null;
-
-        /** Collection of valid HTML nodes */
-        $nodes = array();
-
-        // Collect or normal HTML nodes and those who in not ignored at this level
-        foreach($node->childNodes as & $child) {
-            // Work only with DOMElements
-            if($child->nodeType == 1 && !in_array($child->nodeName, $this->lessIgnore)) {
-
-                // Group node by html tag name
-                if (!isset($nodes[$child->nodeName])) {
-                    $nodes[$child->nodeName] = array();
-                }
-
-                // Add node to a group
-                $nodes[$child->nodeName][] = $child;
-            }
-        }
-
-        // Iterate all "supported" nodes
-        /** @var \DOMNode[] $group */
-        foreach($nodes as $tag => $group) {
-            foreach($group as $child) {
-                //elapsed($child->nodeName);
-                $class = '';
-                $id = '';
-                $name = '';
-
-                /**@var $attribute \DOMNode */
-                foreach ($child->attributes as $attribute) {
-                    if($attribute->name == 'class') {
-                        $class = trim($attribute->nodeValue);
-                    }
-                    if($attribute->name == 'id') {
-                        $id = trim($attribute->nodeValue);
-                    }
-                    if($attribute->name == 'name') {
-                        $name = trim($attribute->nodeValue);
-                    }
-                }
-
-                // Define less selector
-                $selector = '';
-                if (isset($class{0})) {
-                    $selector = '.'.$class;
-                } else if (isset($name{0})) {
-                    $selector = $child->nodeName.'[name='.$name.']';
-                } else if (isset($id{0})) {
-                    $selector = '#'.$id;
-                } else {
-                    $selector = $child->nodeName;
-                }
-
-                // Analyze if node has valid children
-                $isComplex = false;
-                if ($child->hasChildNodes()) {
-                    foreach($child->childNodes as $child2) {
-                        // Work only with DOMElements
-                        if($child2->nodeType == 1 && !in_array($child2->nodeName, $this->lessIgnore)) {
-                            $isComplex = true;
-                            break;
-                        }
-                    }
-                }
-
-                // Build path selector
-                $_path = $path.'->'.$selector;
-
-                // If this node has *normal nodes inside
-                if ($isComplex) {
-
-                    // TODO: handle duplicating inner elements
-
-                    // Don't go same path again
-                    if (!in_array($_path, $this->lessSelectors)) {
-
-                        // Save selector
-                        $this->lessSelectors[] = $_path;
-
-                        elapsed('Building selector: '.$_path);
-
-                        // Save less
-                        if ($this->lessDebug) {
-                            $less .= "\n".$this->spacer($level).'/*'.$_path.'*/';
-                        }
-
-                        $less .= "\n".$this->spacer($level).$selector.' {';
-
-                        // Go deeper in recursion
-                        $this->lessBuilder($child, $less, $level+1, $_path);
-
-                        // Close selector
-                        $less .= "\n".$this->spacer($level).'}';
-                    }
-                } else if($prevPath != $_path){ // Single element and not like previous
-                    $less .= "\n".$this->spacer($level).$selector.' {  }';
-                }
-
-                // Save last path
-                $prevPath = $_path;
-            }
-        }
-    }
-
-    public function __less2()
-    {
-        s()->async(true);
-
-        $tree = new \samsonos\php\skeleton\Tree('app/view/index.php');
-
     }
 
     /**
@@ -213,21 +91,14 @@ class Skeleton extends \samson\core\ExternalModule
             // If we have not generated this file before
             if (!file_exists($lessPath)) {
 
-                // Read it
-                $html = file_get_contents($_path);
+                // Set ignored DOM nodes
+                \samsonos\php\skeleton\Tree::$ignoredNodes = $this->lessIgnore;
 
-                // Remove all PHP code from view
-                $html = preg_replace('/<\?php.*?\?>/', '', $html);
-
-                // Parse HTML
-                $doc = new \DOMDocument();
-                $doc->loadHTML($html);
-
-                // Recursively build less tree
-                $this->lessBuilder($doc, $less);
+                // Build LESS node tree
+                $lessTree = new \samsonos\php\skeleton\Tree($_path);
 
                 // Write generated file
-                file_put_contents($lessPath, $less);
+                file_put_contents($lessPath, $lessTree->toLESS());
 
                 elapsed('Creating LESS file: '.$lessPath);
 

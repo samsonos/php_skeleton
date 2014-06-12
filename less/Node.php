@@ -61,7 +61,7 @@ class Node
             foreach ($node->attributes as $attribute) {
                 $value = trim($attribute->nodeValue);
                 if($attribute->name == 'class' && strlen($value)) {
-                    $this->class[] = $value;
+                    $this->class = explode(' ', $value);
                 } else if($attribute->name == 'id' && strlen($value)) {
                     $this->id = $value;
                 } else if($attribute->name == 'name' && strlen($value)) {
@@ -75,15 +75,10 @@ class Node
             // Choose default LESS selector for node
             $this->selector = $this->tag;
 
-            $className = '';
-            // Iterate classes of this LESS node
-            for($i = 0; $i < sizeof($this->class); $i++) {
-                // Compare with parent class to find first unmatched
-                if($this->class[$i] != $parent->class[$i]) {
-                    // Store it as a class name
-                    $className = '.'.$this->class[$i];
-                    break;
-                }
+            // If we have class attribute
+            if (sizeof($this->class)) {
+                // Use the first class by default
+                $this->selector = '.'.$this->class[0];
             }
         }
     }
