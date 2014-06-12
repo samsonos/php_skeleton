@@ -11,7 +11,7 @@ namespace samsonos\php\skeleton;
  * @copyright 2014 SamsonOS
  * @version 1.0.0
  */
-class Skeleton extends \samson\core\ExternalModule
+class Skeleton extends \samson\core\CompressableExternalModule
 {
     /** @var string Module identifier */
     public $id = 'skeleton';
@@ -46,6 +46,7 @@ class Skeleton extends \samson\core\ExternalModule
         }
     }
 
+    //[PHPCOMPRESSOR(remove,start)]
     /**
      * Asynchronous HTML to LESS converter
      * @return array Asynchronous response array
@@ -192,5 +193,6 @@ function '.$name.'__HANDLER()
 
         $this->html(' ');
     }
+    //[PHPCOMPRESSOR(remove,end)]
 }
 
