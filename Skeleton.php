@@ -46,23 +46,35 @@ class Skeleton extends \samson\core\ExternalModule
         }
     }
 
-    /** Less sandbox controller for testing     */
+    /**
+     * Asynchronous HTML to LESS converter
+     * @return array Asynchronous response array
+     */
+    public function __async_html2less()
+    {
+        $result = array('status' => '0');
+        if(isset($_POST['source'])) {
+            // Save last source
+            $_SESSION['_skeleton_less_source'] = $_POST['source'];
+
+            // Build LESS node tree
+            $lessTree = new \samsonos\php\skeleton\Tree();
+
+            // Convert to LESS
+            $result['less'] = $lessTree->toLESS($_POST['source']);
+            $result['status'] = '1';
+        }
+
+        return $result;
+    }
+
+    /** Less sandbox controller for testing */
     public function __lesssandbox()
     {
         s()->template('view/dashboard.vphp');
 
-        if(isset($_POST['source'])) {
-            // Build LESS node tree
-            $lessTree = new \samsonos\php\skeleton\Tree();
-
-            // Prepare view
-            $this->view('view/dashboard')
-                ->source($_POST['source'])
-                ->less($lessTree->toLESS($_POST['source']));
-
-        } else {
-            $this->view('view/dashboard');
-        }
+        // Pass last source HTML
+        m()->source(isset($_SESSION['_skeleton_less_source']) ? $_SESSION['_skeleton_less_source'] : '');
     }
 
     /**

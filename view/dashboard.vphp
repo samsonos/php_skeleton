@@ -1,27 +1,34 @@
 <!-- Created by Vitaly Iegorov <egorov@samsonos.com> on 11.06.14 at 16:36 -->
 <html>
     <head>
-        <title>Skeleton SamsonPHP module</title>
+        <title>HTML to LESS converter - Skeleton SamsonPHP module</title>
         <link rel="stylesheet" href="http://codemirror.net/lib/codemirror.css">
+        <link href="http://fonts.googleapis.com/css?family=Open+Sans:400,300,300italic,400italic,600,600italic,700,700italic,800,800italic&subset=latin,cyrillic-ext" rel="stylesheet">
         <script src="http://codemirror.net/lib/codemirror.js"></script>
+        <script src="http://codemirror.net/addon/edit/matchbrackets.js"></script>
         <script src="http://codemirror.net/mode/xml/xml.js"></script>
         <script src="http://codemirror.net/mode/css/css.js"></script>
         <script src="http://codemirror.net/mode/javascript/javascript.js"></script>
         <script src="http://codemirror.net/mode/htmlmixed/htmlmixed.js"></script>
     </head>
     <body>
-        <h1>Automatic HTML to LESS converter</h1>
         <section>
-            <form class="converter" action="<?php module_url('lesssandbox')?>" method="post">
+            <form class="converter" action="<?php module_url('html2less')?>" method="post">
                 <div class="input source">
-                    <textarea name="source" placeholder="Source HTML code"><?php vi('source')?></textarea>
+                    <textarea class="input" name="source" placeholder="Source HTML code"><?php vi('source')?></textarea>
+                    <div class="controls">
+                        <a class="btn upload">upload</a><a class="btn submit">convert</a><a class="description">HTML</a>
+                    </div>
                 </div>
                 <div class="input less">
-                    <pre class="less"><code><?php vi('less')?></code></pre>
+                    <textarea class="output" name="output" placeholder="Output LESS code"><?php vi('less')?></textarea>
+                    <div class="controls">
+                        <a class="btn selectAll" href="">select all</a><a class="btn download" id="btnDownload" href="">download</a><a class="description">LESS</a>
+                    </div>
                 </div>
-                <input class="submit" type="submit" value="CONVERT">
+                <input style="display:none" id="submit" type="submit" class="hidden">
             </form>
         </section>
+        <div class="overlay"><?php echo m()->output('view/loader')?></div>
     </body>
 </html>
- 
