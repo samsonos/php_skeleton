@@ -119,6 +119,7 @@ class Tree
 
             // Parse HTML
             $this->dom = new \DOMDocument();
+            libxml_use_internal_errors(true);
             $this->dom->loadHTML($this->html);
 
             // Generate LESS Node tree
