@@ -16,14 +16,8 @@ class Tree
     /** Source html tree */
     public $html = '';
 
-    /** @var Node[] Collection of LESS nodes */
-    protected $nodes = array();
-
     /** @var \DOMNode Pointer to current dom element */
     protected $dom;
-
-    /** @var Node Pointer to current less element */
-    protected $less;
 
     protected $path;
 
@@ -75,19 +69,24 @@ class Tree
     /**
      * Inner recursive output LESS generator
      *
-     * @param Node   $node
-     * @param string $output
-     * @param int    $level
+     * @param array     $node   Current LESS path array pointer
+     * @param string    $output Current LESS text output
+     * @param int       $level  Current LESS nesting level
      */
     protected function _toLESS(array $node, & $output = '', $level = 0)
     {
+        // Iterate all LESS path node array
         foreach ($node as $key => $child) {
+
+            // If this path key is not ignored
             if(!in_array($key, self::$ignoredNodes)) {
                 $output .= "\n".$this->spacer($level).$key.' {';
             }
 
+            // Go deeper in recursion
             $this->_toLESS($child, $output, $level+1);
 
+            // If this path key is not ignored
             if(!in_array($key, self::$ignoredNodes)) {
                 $output .= "\n".$this->spacer($level).'}';
             }
@@ -119,11 +118,8 @@ class Tree
             $this->dom = new \DOMDocument();
             $this->dom->loadHTML($this->html);
 
-            // Create empty top LESS Node
-            $this->less = new Node($this->dom);
-
             // Generate LESS Node tree
-            $this->handleNode($this->dom, $this->less, $this->path);
+            $this->handleNode($this->dom, $this->path);
 
             // Generate recursively LESS code
             $this->_toLESS($this->path, $output);
