@@ -1,90 +1,87 @@
-html {
+#skeleton {
   h1,h2,a,input {font-family: 'OpenSans'; }
+  h1 {
+    font-size:2em;
+    width:100%;
+    text-align: center;
+  }
+  .overlay {
+    position:fixed;
+    top:0px;
+    bottom:0px;
+    left:0px;
+    right:0px;
+    background-color: rgba(0,0,0,0.8);
+    z-index: 999;
+    display: none;
 
-  body {
-    h1 {
-      font-size:2em;
+    .windows8 { position: absolute; left:50%; top:50%; margin-left: -50px; margin-top: -50px;}
+  }
+
+  .copyright {
+    position:fixed;
+    right:0px;
+    bottom:0px;
+    background-color: rgba(0,0,0,0.8);
+    color:white;
+    padding:5px 10px;
+
+    a{color:white;}
+  }
+
+  section {
+    .converter {
       width:100%;
-      text-align: center;
-    }
-    .overlay {
-      position:fixed;
-      top:0px;
-      bottom:0px;
-      left:0px;
-      right:0px;
-      background-color: rgba(0,0,0,0.8);
-      z-index: 999;
-      display: none;
 
-      .windows8 { position: absolute; left:50%; top:50%; margin-left: -50px; margin-top: -50px;}
-    }
+      .input {
+        float:left;
+        width:50%;
+        height:100%;
+        position:relative;
 
-    .copyright {
-      position:fixed;
-      right:0px;
-      bottom:0px;
-      background-color: rgba(0,0,0,0.8);
-      color:white;
-      padding:5px 10px;
-
-      a{color:white;}
-    }
-
-    section {
-      .converter {
-        width:100%;
-
-        .input {
-          float:left;
-          width:50%;
+        .CodeMirror{
+          width:100%;
           height:100%;
-          position:relative;
+          border-left:4px solid #eee;
+          border-top:1px solid #eee;
+          border-right:1px solid #eee;
+          border-bottom:1px solid #eee;
+          display: block;
+          color: #333;
+          background: #f8f8ff;
+        }
 
-          .CodeMirror{
-            width:100%;
-            height:100%;
-            border-left:4px solid #eee;
-            border-top:1px solid #eee;
-            border-right:1px solid #eee;
-            border-bottom:1px solid #eee;
-            display: block;
-            color: #333;
-            background: #f8f8ff;
-          }
+        .controls {
+          position:absolute;
+          top:0px;
+          right: 16px;
+          z-index: 999;
 
-          .controls {
-            position:absolute;
-            top:0px;
-            right: 16px;
-            z-index: 999;
+          a {
+            display: inline-block;
+            height:27px;
+            border:0;
+            padding:5px 10px;
+            color:white; background-color: rgba(0,0,0,0.8);
+            vertical-align: middle;
 
-            a {
-              display: inline-block;
-              height:27px;
-              border:0;
-              padding:5px 10px;
-              color:white; background-color: rgba(0,0,0,0.8);
-              vertical-align: middle;
+            &.upload, &.download { display: none;}
 
-              &.upload, &.download { display: none;}
+            &.btn{
+              border-right:1px solid white;
 
-              &.btn{
-                border-right:1px solid white;
-
-                &:hover {  .opacity(80);}
-              }
+              &:hover {  .opacity(80);}
             }
-
-            #btnSelectAll {}
           }
 
-          &.less{
+          #btnSelectAll {}
+        }
 
-          }
-          &.source {
+        &.less{
 
-          }
+        }
+        &.source {
+
         }
       }
     }
