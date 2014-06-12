@@ -20,10 +20,11 @@ System will automatically create ```css/contacts_index.less``` file with less se
 
 ###Less generator Configuration
 Available two configurable parameters for tuning less generator:
- * ```array $lessIgnore``` Collection of tags to ignore
+ * ```array $lessIgnore``` Collection of tags, classes, less selectors to ignore, you can specify any less selector that you don't want
+ to be outputted in generated LESS file
 
 ###Less generator SandBox
-If you want to test LESS generator online you can visit ```/skeleton/lesssandbox``` controller
+If you want to test LESS generator online you can visit ```[domain]/skeleton/lesssandbox``` controller
 
 ##Example configuration class for this module:
 ```
