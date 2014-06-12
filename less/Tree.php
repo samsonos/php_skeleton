@@ -194,7 +194,7 @@ class Tree
                 $oldPath = &$path;
 
                 // If there is more than one DOM child node with this tag name at this level
-                if ($childrenTagArray[$childNode->tag] > 1)
+                if ($childrenTagArray[$childNode->tag] > 1 && $childNode->tag != 'div')
                 {
                     // Create correct LESS class name
                     $class = '&.'.$firstClass;
