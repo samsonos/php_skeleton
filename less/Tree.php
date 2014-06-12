@@ -242,7 +242,7 @@ class Tree
                     $this->handleNode($child, $path[$class]);
                 }
 
-                // Return old LESS path
+                // Return old LESS path tree
                 $path = & $oldPath;
             }
         }
