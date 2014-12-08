@@ -6,5 +6,8 @@
         "email":"egorov@samsonos.com"
     },
 	"version":"1.0.0",
-	"require":{"samsonos/php_core":"*"}
+	"require":{
+		"samsonos/php_core":"*",
+		"samsonos/js_core":"*"
+	}
 }
